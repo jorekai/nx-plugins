@@ -1,81 +1,30 @@
-import {
-  Card,
-  Grid,
-  Link,
-  Page,
-  Snippet,
-  Text,
-  Tooltip,
-} from "@geist-ui/react";
-import React, { useEffect, useState } from "react";
+import { NextPage } from "next";
+import { Page } from "@geist-ui/react";
+import PluginGrid from "../components/plugin/PluginGrid";
+import React from "react";
+import withInitPlugins from "../hooks/withInitPlugins";
 
-import Github from "@geist-ui/react-icons/github";
-
-type Plugin = {
+export interface IPlugin {
   name: string;
   description: string;
   url: string;
-};
+}
 
-export default function Home() {
-  const [plugins, setPlugins] = useState<Plugin[]>();
+export interface HomeProps {
+  initPlugins?: IPlugin[];
+}
 
-  useEffect(() => {
-    fetch(
-      "https://raw.githubusercontent.com/nrwl/nx/master/community/approved-plugins.json"
-    ).then((res: any) =>
-      res.json().then((value: Plugin[]) => {
-        setPlugins(value);
-      })
-    );
-  }, []);
-
+const Home: NextPage<HomeProps> = ({ initPlugins }) => {
   return (
-    <Page
-      dotBackdrop
-      size="large"
-      style={{ minWidth: "80vw", justifyContent: "center" }}>
-      <Grid.Container gap={1} justify="center">
-        {plugins?.map((plugin, index) => {
-          return (
-            <>
-              <Grid xs key={index}>
-                <Card type={"dark"}>
-                  <Card.Content
-                    style={{
-                      justifyContent: "center",
-                      display: "flex",
-                      padding: 10,
-                    }}>
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}>
-                      <Link href={plugin.url}>
-                        <Github />
-                      </Link>
-                      <Tooltip
-                        placement="rightEnd"
-                        text={plugin.description}
-                        style={{ fontWeight: 600 }}>
-                        <Snippet
-                          type="dark"
-                          filled
-                          text={`yarn add -D ${plugin.name}`}
-                          width="100%"
-                          toastText={`Copied "${plugin.name}" to clipboard`}
-                        />
-                      </Tooltip>
-                    </div>
-                  </Card.Content>
-                </Card>
-              </Grid>
-            </>
-          );
-        })}
-      </Grid.Container>
+    <Page size="large" style={{ minWidth: "80vw", justifyContent: "center" }}>
+      <Page.Header style={{ textAlign: "center" }}>
+        <h2>NX Community Plugins</h2>
+      </Page.Header>
+      <PluginGrid initPlugins={initPlugins} />
     </Page>
   );
-}
+};
+
+const { home } = withInitPlugins(Home);
+
+export default home;
